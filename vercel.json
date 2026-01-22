@@ -1,1 +1,1 @@
-﻿{"buildCommand": "cd Frontend && npm run build", "outputDirectory": "Frontend/build", "installCommand": "cd Frontend && npm install"}
+{"buildCommand": "cd Frontend && npm run build", "outputDirectory": "Frontend/build", "installCommand": "cd Frontend && npm install"}
