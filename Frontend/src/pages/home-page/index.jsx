@@ -8,6 +8,7 @@ import BombayHighCourtSection from './components/BombayHighCourtSection';
 import PlaygroundSection from './components/PlaygroundSection';
 import KeyboardsSection from './components/KeyboardsSection';
 import TypingLessonsSection from './components/TypingLessonsSection';
+import RegistrationSection from './components/RegistrationSection';
 import Footer from './components/Footer';
 
 const HomePage = () => {
@@ -22,6 +23,7 @@ const HomePage = () => {
         <PlaygroundSection />
         <KeyboardsSection />
         <TypingLessonsSection />
+        <RegistrationSection />
       </main>
       <Footer />
     </div>
