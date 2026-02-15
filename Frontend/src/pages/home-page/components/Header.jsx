@@ -1,16 +1,33 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollToRegistration = (e) => {
+    e.preventDefault();
+    
+    if (location.pathname === '/home-page') {
+      // Already on home page, just scroll
+      const element = document.getElementById('registration');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // Navigate to home page first, then scroll
+      navigate('/home-page#registration');
+    }
+  };
 
   const navItems = [
     { name: 'Home', path: '/home-page' },
-    { name: 'Test', path: '/typing-test-interface' },
-    { name: 'Mock Exams', path: '/mock-exam-module' },
-    { name: 'Playground', path: '/typing-playground' },
+    { name: 'Typing test', path: '/typing-test-interface' },
+    { name: 'ID Registration', path: '#registration', onClick: scrollToRegistration },
+    { name: 'Forms', path: '/typing-playground' },
   ];
 
   return (
@@ -30,13 +47,23 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems?.map((item) => (
-              <Link
-                key={item?.name}
-                to={item?.path}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-              >
-                {item?.name}
-              </Link>
+              item?.onClick ? (
+                <button
+                  key={item?.name}
+                  onClick={item?.onClick}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                >
+                  {item?.name}
+                </button>
+              ) : (
+                <Link
+                  key={item?.name}
+                  to={item?.path}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                >
+                  {item?.name}
+                </Link>
+              )
             ))}
           </nav>
 
@@ -68,14 +95,27 @@ const Header = () => {
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-2">
               {navItems?.map((item) => (
-                <Link
-                  key={item?.name}
-                  to={item?.path}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item?.name}
-                </Link>
+                item?.onClick ? (
+                  <button
+                    key={item?.name}
+                    onClick={(e) => {
+                      item?.onClick(e);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors text-left"
+                  >
+                    {item?.name}
+                  </button>
+                ) : (
+                  <Link
+                    key={item?.name}
+                    to={item?.path}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item?.name}
+                  </Link>
+                )
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t">
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)}>

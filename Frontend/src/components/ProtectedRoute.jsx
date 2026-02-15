@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getCurrentUser } from '../store/slices/authSlice';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {

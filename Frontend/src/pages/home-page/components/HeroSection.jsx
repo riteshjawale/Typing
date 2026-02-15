@@ -42,7 +42,7 @@ const HeroSection = () => {
                 className="bg-white text-indigo-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all px-8"
               >
                 <Keyboard className="mr-2" size={20} />
-                Start Free Test
+                Start Test
               </Button>
             </Link>
             <Button

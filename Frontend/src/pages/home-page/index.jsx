@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import FreeTypingTestSection from './components/FreeTypingTestSection';
 import MockExamsSection from './components/MockExamsSection';
-import BombayHighCourtSection from './components/BombayHighCourtSection';
 import PlaygroundSection from './components/PlaygroundSection';
 import KeyboardsSection from './components/KeyboardsSection';
 import TypingLessonsSection from './components/TypingLessonsSection';
@@ -12,6 +11,19 @@ import RegistrationSection from './components/RegistrationSection';
 import Footer from './components/Footer';
 
 const HomePage = () => {
+  useEffect(() => {
+    // Handle hash scroll when component mounts
+    const hash = window.location.hash;
+    if (hash === '#registration') {
+      setTimeout(() => {
+        const element = document.getElementById('registration');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Header />
@@ -19,7 +31,6 @@ const HomePage = () => {
         <HeroSection />
         <FreeTypingTestSection />
         <MockExamsSection />
-        <BombayHighCourtSection />
         <PlaygroundSection />
         <KeyboardsSection />
         <TypingLessonsSection />

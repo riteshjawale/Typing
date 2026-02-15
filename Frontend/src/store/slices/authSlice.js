@@ -5,12 +5,21 @@ export const signupUser = createAsyncThunk(
   'auth/signup',
   async (userData, { rejectWithValue }) => {
     try {
-      const data = await authService.signup(userData);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      return data;
+      // Mock signup - accept any data for now
+      // TODO: Re-enable actual API call when backend is ready
+      const mockUser = {
+        id: '1',
+        name: userData.name || 'User',
+        email: userData.email || 'user@example.com'
+      };
+      const mockToken = 'mock-token-' + Date.now();
+      
+      localStorage.setItem('token', mockToken);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      
+      return { user: mockUser, token: mockToken };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Signup failed');
+      return rejectWithValue('Signup failed');
     }
   }
 );
@@ -19,12 +28,21 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const data = await authService.login(credentials);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      return data;
+      // Mock login - accept any credentials for now
+      // TODO: Re-enable actual API call when backend is ready
+      const mockUser = {
+        id: '1',
+        name: credentials.email?.split('@')[0] || 'User',
+        email: credentials.email || 'user@example.com'
+      };
+      const mockToken = 'mock-token-' + Date.now();
+      
+      localStorage.setItem('token', mockToken);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      
+      return { user: mockUser, token: mockToken };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      return rejectWithValue('Login failed');
     }
   }
 );
@@ -33,10 +51,14 @@ export const getCurrentUser = createAsyncThunk(
   'auth/getCurrentUser',
   async (_, { rejectWithValue }) => {
     try {
-      const data = await authService.getMe();
-      return data;
+      // Mock - return user from localStorage
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) {
+        throw new Error('No user found');
+      }
+      return { user };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user');
+      return rejectWithValue('Failed to fetch user');
     }
   }
 );

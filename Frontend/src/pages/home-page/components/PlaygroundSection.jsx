@@ -8,23 +8,31 @@ const PlaygroundSection = () => {
       title: 'English Playground',
       subtitle: 'English Typing Playground',
       description: 'Practice your own English (Paragraph) Here.',
-      icon: '🇬🇧',
+      icon: <>E&nbsp;&nbsp;&nbsp;English</>,
       color: 'from-blue-500 to-cyan-500',
       bgColor: 'bg-blue-50',
     },
     {
-      title: 'Marathi Playground',
+      title: 'Marathi [Remington]',
       subtitle: 'Marathi Remington Keyboard Typing Playground',
       description: 'Practice your own Marathi (Remington keyboard) Paragraph Here.',
-      icon: '🇮🇳',
+      icon: <>म&nbsp;&nbsp;&nbsp;मराठी</>,
       color: 'from-orange-500 to-red-500',
       bgColor: 'bg-orange-50',
     },
     {
-      title: 'Marathi Playground',
+      title: 'Marathi [Unicode]',
+      subtitle: 'Unicode Typing Playground',
+      description: 'Practice your own Marathi (Unicode) Paragraph Here.',
+      icon: <>म&nbsp;&nbsp;&nbsp;मराठी</>,
+      color: 'from-purple-500 to-pink-500',
+      bgColor: 'bg-purple-50',
+    },
+    {
+      title: 'Marathi [Kruti Dev]',
       subtitle: 'Kruti Dev Typing Playground',
       description: 'Practice your own Marathi (Paragraph) Here.',
-      icon: '📝',
+      icon: <>म&nbsp;&nbsp;&nbsp;मराठी</>,
       color: 'from-green-500 to-emerald-500',
       bgColor: 'bg-green-50',
     },
@@ -40,15 +48,15 @@ const PlaygroundSection = () => {
             <span>Practice Zone</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Free Practice Typing Playground
+            Practice Typing Playground
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Wide variety of passages are free to practice for Marathi and English languages.
+            Wide variety of passages are available to practice for Marathi and English languages.
           </p>
         </div>
 
         {/* Playground Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {playgrounds?.map((playground, index) => (
             <div
               key={index}

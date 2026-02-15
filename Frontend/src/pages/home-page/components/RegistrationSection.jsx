@@ -4,7 +4,7 @@ import { Briefcase, FileText, UserPlus } from 'lucide-react';
 
 const RegistrationSection = () => {
   return (
-    <section className="py-16 bg-white border-t-2 border-b-2 border-gray-200">
+    <section id="registration" className="py-16 bg-white border-t-2 border-b-2 border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-10">

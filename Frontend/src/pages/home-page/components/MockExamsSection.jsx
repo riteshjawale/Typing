@@ -1,16 +1,37 @@
 import React from 'react';
 import { Lock, CheckCircle, Clock, FileText } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
 
 const MockExamsSection = () => {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  const handleStartMockTest = () => {
+    if (isAuthenticated) {
+      navigate('/mock-exam-module');
+    } else {
+      navigate('/login');
+    }
+  };
+
   const mockExams = [
     {
-      title: 'MPSC Skill Test Marathi / English',
+      title: 'MPSC Typing Skill Test Marathi / English',
       description: 'Take MPSC Skill Test for Marathi / English',
       duration: '32 minutes',
       sections: 5,
       locked: false,
       popular: true,
+    },
+    {
+      title: 'Bombay High Court Typing Test Marathi / English',
+      description: 'Take Bombay High Court Typing Test for Marathi / English',
+      duration: '45 minutes',
+      sections: 6,
+      locked: false,
+      popular: false,
     },
   ];
 
@@ -32,7 +53,7 @@ const MockExamsSection = () => {
         </div>
 
         {/* Mock Exam Cards */}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-6">
           {mockExams?.map((exam, index) => (
             <div
               key={index}
@@ -83,6 +104,7 @@ const MockExamsSection = () => {
                     <Button
                       size="lg"
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                      onClick={handleStartMockTest}
                     >
                       Start Mock Test
                     </Button>

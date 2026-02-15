@@ -6,45 +6,45 @@ import Button from '../../../components/ui/Button';
 const FreeTypingTestSection = () => {
   const tests = [
     {
-      title: 'Marathi Typing Test',
-      subtitle: 'Marathi Remington Typing Test',
-      description: 'We have more than 100 passages available for Marathi Typing Test.',
+      title: 'Marathi Typing layout [Remington]',
+      subtitle: 'Marathi Remington Typing layout',
+      description: 'We have more than 100 passages available for Marathi Typing layout.',
       difficulty: 'Easy to Hard',
       duration: '10-30 min',
-      icon: '🇮🇳',
+      icon: <>म&nbsp;&nbsp;&nbsp;मराठी</>,
       color: 'from-orange-500 to-red-500',
       bgColor: 'bg-orange-50',
       borderColor: 'border-orange-200',
     },
     {
-      title: 'English Typing Test',
-      subtitle: 'English Typing Test',
-      description: 'We have 200 passages available for English Typing Test.',
+      title: 'English Typing layout',
+      subtitle: 'English Typing layout',
+      description: 'We have 200 passages available for English Typing layout.',
       difficulty: 'Beginner to Expert',
       duration: '5-30 min',
-      icon: '🇬🇧',
+      icon: <>E&nbsp;&nbsp;&nbsp;English</>,
       color: 'from-blue-500 to-indigo-500',
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
     },
     {
-      title: 'Marathi Typing Test',
-      subtitle: 'Marathi Kruti Dev Typing Test',
-      description: 'We have passages available for Marathi Kruti Dev Typing Test.',
+      title: 'Marathi Typing layout [Unicode]',
+      subtitle: 'Marathi Unicode Typing layout',
+      description: 'We have passages available for Marathi Unicode Typing layout.',
       difficulty: 'Easy to Hard',
       duration: '10-30 min',
-      icon: '📝',
+      icon: <>म&nbsp;&nbsp;&nbsp;मराठी</>,
       color: 'from-green-500 to-emerald-500',
       bgColor: 'bg-green-50',
       borderColor: 'border-green-200',
     },
     {
-      title: 'Hindi Typing Test',
-      subtitle: 'Hindi Kruti Dev Typing Test',
-      description: 'We have passages available for Hindi Kruti Dev Typing Test.',
+      title: 'Marathi Typing layout [Kruti Dev 055]',
+      subtitle: 'Marathi Kruti Dev 055 Typing layout',
+      description: 'We have passages available for Marathi Kruti Dev 055 Typing layout.',
       difficulty: 'Easy to Hard',
       duration: '10-30 min',
-      icon: '🇮🇳',
+      icon: <>म&nbsp;&nbsp;&nbsp;मराठी</>,
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
@@ -57,10 +57,10 @@ const FreeTypingTestSection = () => {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Free Typing Test
+            Typing layouts
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Wide variety of passages are free to practice for Marathi and English languages.
+            Wide variety of passages are available to practice for Marathi and English languages.
           </p>
         </div>
 
