@@ -551,35 +551,41 @@ const RegistrationForm = () => {
 
             <div className="border-2 border-gray-200 p-4 bg-gray-50">
               <h3 className="font-bold text-gray-700 mb-3">Required Resources:</h3>
-              <div className="space-y-2">
-                <label className="inline-flex items-center gap-2 text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={formData.resources.computerLaptop}
-                    onChange={(e) => handleResourceChange('computerLaptop', e.target.checked)}
-                    className="h-4 w-4 border-2 border-gray-400 rounded-none"
-                  />
-                  <span>a) Computer / Laptop</span>
-                </label>
-                <label className="inline-flex items-center gap-2 text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={formData.resources.internet}
-                    onChange={(e) => handleResourceChange('internet', e.target.checked)}
-                    className="h-4 w-4 border-2 border-gray-400 rounded-none"
-                  />
-                  <span>b) Internet</span>
-                </label>
-                <label className="inline-flex items-center gap-2 text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={formData.resources.headphonesEarbuds}
-                    onChange={(e) => handleResourceChange('headphonesEarbuds', e.target.checked)}
-                    className="h-4 w-4 border-2 border-gray-400 rounded-none"
-                  />
-                  <span>c) Headphones / Earbuds</span>
-                </label>
-              </div>
+              <ul className="space-y-2">
+                <li>
+                  <label className="flex items-center gap-2 text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={formData.resources.computerLaptop}
+                      onChange={(e) => handleResourceChange('computerLaptop', e.target.checked)}
+                      className="h-4 w-4 border-2 border-gray-400 rounded-none"
+                    />
+                    <span>a) Computer / Laptop</span>
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center gap-2 text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={formData.resources.internet}
+                      onChange={(e) => handleResourceChange('internet', e.target.checked)}
+                      className="h-4 w-4 border-2 border-gray-400 rounded-none"
+                    />
+                    <span>b) Internet</span>
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center gap-2 text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={formData.resources.headphonesEarbuds}
+                      onChange={(e) => handleResourceChange('headphonesEarbuds', e.target.checked)}
+                      className="h-4 w-4 border-2 border-gray-400 rounded-none"
+                    />
+                    <span>c) Headphones / Earbuds</span>
+                  </label>
+                </li>
+              </ul>
               {errors.equipment && <p className="text-red-600 text-sm mt-2">{errors.equipment}</p>}
             </div>
 
