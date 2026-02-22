@@ -28,7 +28,20 @@ A modern React-based project utilizing the latest frontend technologies and tool
    yarn install
    ```
    
-2. Start the development server:
+2. Configure environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   Add your Supabase values:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_SUPABASE_REGISTRATION_TABLE`
+   - `VITE_SUPABASE_REGISTRATION_BUCKET`
+
+3. In Supabase SQL Editor, run:
+   - `supabase/registration_setup.sql`
+
+4. Start the development server:
    ```bash
    npm start
    # or

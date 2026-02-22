@@ -1,17 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { getCurrentUser } from '../store/slices/authSlice';
+import { useSelector } from 'react-redux';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const { isAuthenticated, initialized } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (isAuthenticated && !user) {
-      dispatch(getCurrentUser());
-    }
-  }, [isAuthenticated, user, dispatch]);
+  if (!initialized) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

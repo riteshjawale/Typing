@@ -15,7 +15,7 @@ const Signup = () => {
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+  const { loading, error, info, isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -52,6 +52,11 @@ const Signup = () => {
           {error && (
             <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
               <p className="text-sm text-red-600 text-center">{error}</p>
+            </div>
+          )}
+          {info && (
+            <div className="mb-6 rounded-lg bg-blue-50 border border-blue-200 p-4">
+              <p className="text-sm text-blue-700 text-center">{info}</p>
             </div>
           )}
 

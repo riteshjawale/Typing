@@ -60,10 +60,10 @@ const PlaygroundSection = () => {
           {playgrounds?.map((playground, index) => (
             <div
               key={index}
-              className={`${playground?.bgColor} border-2 border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
+              className={`${playground?.bgColor} border-2 border-gray-200 rounded-2xl p-8 h-full flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
             >
               {/* Icon */}
-              <div className="text-6xl mb-6 text-center">{playground?.icon}</div>
+              <div className="text-5xl mb-6 text-center">{playground?.icon}</div>
 
               {/* Title */}
               <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">
@@ -81,7 +81,7 @@ const PlaygroundSection = () => {
               {/* CTA Button */}
               <Button
                 fullWidth
-                className={`bg-gradient-to-r ${playground?.color} hover:shadow-lg transition-all`}
+                className={`mt-auto bg-gradient-to-r ${playground?.color} hover:shadow-lg transition-all`}
               >
                 <Play size={16} className="mr-2" />
                 Start Practicing

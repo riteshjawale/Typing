@@ -1,34 +1,38 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Menu, X } from 'lucide-react';
 import Button from '../../../components/ui/Button';
+import { logoutUser } from '../../../store/slices/authSlice';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const location = useLocation();
-
-  const scrollToRegistration = (e) => {
-    e.preventDefault();
-    
-    if (location.pathname === '/home-page') {
-      // Already on home page, just scroll
-      const element = document.getElementById('registration');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      // Navigate to home page first, then scroll
-      navigate('/home-page#registration');
-    }
-  };
+  const navigate = useNavigate();
 
   const navItems = [
     { name: 'Home', path: '/home-page' },
-    { name: 'Typing test', path: '/typing-test-interface' },
-    { name: 'ID Registration', path: '#registration', onClick: scrollToRegistration },
-    { name: 'Forms', path: '/typing-playground' },
+    { name: 'Typing test', path: '/typing-playground' },
+    { name: 'ID Registration', path: '/forms' },
+    { name: 'Forms', disabled: true },
   ];
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    setMobileMenuOpen(false);
+    navigate('/home-page');
+  };
+
+  const handleHomeClick = (e) => {
+    e.preventDefault();
+    if (location.pathname === '/home-page' || location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    navigate('/home-page');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
@@ -47,38 +51,66 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems?.map((item) => (
-              item?.onClick ? (
-                <button
-                  key={item?.name}
-                  onClick={item?.onClick}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                >
-                  {item?.name}
-                </button>
+              item?.disabled ? (
+                <div key={item?.name} className="relative group">
+                  <button
+                    type="button"
+                    aria-disabled="true"
+                    className="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 rounded-lg cursor-default"
+                  >
+                    {item?.name}
+                  </button>
+                  <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    Coming soon
+                  </span>
+                </div>
               ) : (
-                <Link
-                  key={item?.name}
-                  to={item?.path}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                >
-                  {item?.name}
-                </Link>
+                item?.name === 'Home' ? (
+                  <Link
+                    key={item?.name}
+                    to={item?.path}
+                    onClick={handleHomeClick}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  >
+                    {item?.name}
+                  </Link>
+                ) : (
+                  <Link
+                    key={item?.name}
+                    to={item?.path}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  >
+                    {item?.name}
+                  </Link>
+                )
               )
             ))}
           </nav>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm">
-                Login
+            {isAuthenticated ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+              >
+                Logout
               </Button>
-            </Link>
-            <Link to="/signup">
-              <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
-                Sign Up
-              </Button>
-            </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -95,39 +127,63 @@ const Header = () => {
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-2">
               {navItems?.map((item) => (
-                item?.onClick ? (
-                  <button
-                    key={item?.name}
-                    onClick={(e) => {
-                      item?.onClick(e);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors text-left"
-                  >
-                    {item?.name}
-                  </button>
+                item?.disabled ? (
+                  <div key={item?.name} className="relative group">
+                    <button
+                      type="button"
+                      aria-disabled="true"
+                      className="w-full px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 rounded-lg text-left cursor-default"
+                    >
+                      {item?.name}
+                    </button>
+                    <span className="pointer-events-none absolute left-4 top-full z-10 mt-2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                      Coming soon
+                    </span>
+                  </div>
                 ) : (
-                  <Link
-                    key={item?.name}
-                    to={item?.path}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item?.name}
-                  </Link>
+                  item?.name === 'Home' ? (
+                    <Link
+                      key={item?.name}
+                      to={item?.path}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                      onClick={(e) => {
+                        handleHomeClick(e);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      {item?.name}
+                    </Link>
+                  ) : (
+                    <Link
+                      key={item?.name}
+                      to={item?.path}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item?.name}
+                    </Link>
+                  )
                 )
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t">
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" fullWidth>
-                    Login
+                {isAuthenticated ? (
+                  <Button variant="ghost" size="sm" fullWidth onClick={handleLogout}>
+                    Logout
                   </Button>
-                </Link>
-                <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                  <Button size="sm" fullWidth className="bg-gradient-to-r from-indigo-600 to-purple-600">
-                    Sign Up
-                  </Button>
-                </Link>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" size="sm" fullWidth>
+                        Login
+                      </Button>
+                    </Link>
+                    <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                      <Button size="sm" fullWidth className="bg-gradient-to-r from-indigo-600 to-purple-600">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

@@ -69,7 +69,7 @@ const FreeTypingTestSection = () => {
           {tests?.map((test, index) => (
             <div
               key={index}
-              className={`group relative ${test?.bgColor} ${test?.borderColor} border-2 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
+              className={`group relative ${test?.bgColor} ${test?.borderColor} border-2 rounded-2xl p-6 h-full flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
             >
               {/* Icon */}
               <div className="text-5xl mb-4">{test?.icon}</div>
@@ -98,7 +98,7 @@ const FreeTypingTestSection = () => {
               </div>
 
               {/* CTA Button */}
-              <Link to="/typing-test-interface">
+              <Link to="/typing-test-interface" className="mt-auto block">
                 <Button
                   fullWidth
                   className={`bg-gradient-to-r ${test?.color} hover:shadow-lg transition-all`}

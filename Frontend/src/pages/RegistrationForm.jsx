@@ -1,132 +1,207 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { submitRegistrationApplication } from '../services/registrationService';
+
+const WEEK_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+const createInitialAvailability = () =>
+  WEEK_DAYS.reduce((acc, day) => {
+    acc[day] = { enabled: false, from: '', to: '' };
+    return acc;
+  }, {});
+
+const getInitialFormData = () => ({
+  role: '',
+  fullName: '',
+  address: '',
+  photo: null,
+  shopAddress: '',
+  shopAct: null,
+  shopPhoto: null,
+  mobile: '',
+  availability: createInitialAvailability(),
+  bankName: '',
+  accountNumber: '',
+  ifscCode: '',
+  email: '',
+  services: '',
+  aadhaar: null,
+  resources: {
+    computerLaptop: false,
+    internet: false,
+    headphonesEarbuds: false,
+  },
+  consent: false,
+});
 
 const RegistrationForm = () => {
-  const [formData, setFormData] = useState({
-    role: '',
-    fullName: '',
-    address: '',
-    photo: null,
-    shopAddress: '',
-    shopAct: null,
-    shopPhoto: null,
-    mobile: '',
-    otp: '',
-    availableTime: '',
-    bankName: '',
-    accountNumber: '',
-    ifscCode: '',
-    email: '',
-    services: '',
-    aadhaar: null,
-    consent: false
-  });
+  const [formData, setFormData] = useState(getInitialFormData);
 
   const [errors, setErrors] = useState({});
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formKey, setFormKey] = useState(0);
+  const [submitToast, setSubmitToast] = useState(null);
 
   const roles = [
     { value: '', label: 'Select Role' },
     { value: 'typist', label: 'Typist' },
     { value: 'stenographer', label: 'Stenographer' },
     { value: 'designer', label: 'Designer' },
-    { value: 'computer_operator', label: 'Computer Operator' }
+    { value: 'computer_operator', label: 'Computer Operator' },
   ];
 
   const handleInputChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value
+      [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value,
     }));
-    // Clear error when user starts typing
+
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleAvailabilityToggle = (day) => {
+    setFormData((prev) => ({
+      ...prev,
+      availability: {
+        ...prev.availability,
+        [day]: {
+          ...prev.availability[day],
+          enabled: !prev.availability[day].enabled,
+        },
+      },
+    }));
+
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.availableTime;
+      delete next[`availability_${day}`];
+      return next;
+    });
+  };
+
+  const handleAvailabilityTimeChange = (day, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      availability: {
+        ...prev.availability,
+        [day]: {
+          ...prev.availability[day],
+          [field]: value,
+        },
+      },
+    }));
+
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[`availability_${day}`];
+      return next;
+    });
+  };
+
+  const handleResourceChange = (name, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      resources: {
+        ...prev.resources,
+        [name]: checked,
+      },
+    }));
+
+    if (errors.equipment) {
+      setErrors((prev) => ({ ...prev, equipment: '' }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.role) newErrors.role = 'Please select a role';
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.address.trim()) newErrors.address = 'Address is required';
-    if (!formData.photo) newErrors.photo = 'Photo is required';
-    if (!formData.mobile.trim()) {
-      newErrors.mobile = 'Mobile number is required';
-    } else if (!/^[0-9]{10}$/.test(formData.mobile)) {
-      newErrors.mobile = 'Mobile number must be 10 digits';
-    }
-    if (!otpVerified) newErrors.otp = 'Please verify mobile number with OTP';
-    if (!formData.availableTime.trim()) newErrors.availableTime = 'Available time is required';
-    if (!formData.bankName.trim()) newErrors.bankName = 'Bank name is required';
-    if (!formData.accountNumber.trim()) newErrors.accountNumber = 'Account number is required';
-    if (!formData.ifscCode.trim()) newErrors.ifscCode = 'IFSC code is required';
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
+
+    if (!formData.mobile.trim()) {
+      newErrors.mobile = 'Mobile number is required';
+    } else if (!/^[0-9]{10}$/.test(formData.mobile)) {
+      newErrors.mobile = 'Mobile number must be 10 digits';
+    }
+
+    const selectedDays = WEEK_DAYS.filter((day) => formData.availability[day].enabled);
+    if (selectedDays.length === 0) {
+      newErrors.availableTime = 'Please select at least one day and set time.';
+    } else {
+      selectedDays.forEach((day) => {
+        const slot = formData.availability[day];
+        if (!slot.from || !slot.to) {
+          newErrors[`availability_${day}`] = `${day}: select both from and to time.`;
+        }
+      });
+    }
+
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.photo) newErrors.photo = 'Photo is required';
+    if (!formData.bankName.trim()) newErrors.bankName = 'Bank name is required';
+    if (!formData.accountNumber.trim()) newErrors.accountNumber = 'Account number is required';
+    if (!formData.ifscCode.trim()) newErrors.ifscCode = 'IFSC code is required';
     if (!formData.services.trim()) newErrors.services = 'Services list is required';
     if (!formData.aadhaar) newErrors.aadhaar = 'Aadhaar card upload is required';
+    const allResourcesChecked =
+      formData.resources.computerLaptop &&
+      formData.resources.internet &&
+      formData.resources.headphonesEarbuds;
+    if (!allResourcesChecked) newErrors.equipment = 'all equipment are necessary';
     if (!formData.consent) newErrors.consent = 'You must agree to the terms and conditions';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSendOTP = () => {
-    if (!formData.mobile || !/^[0-9]{10}$/.test(formData.mobile)) {
-      setErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit mobile number' }));
-      return;
-    }
-    // Simulate OTP sending
-    setOtpSent(true);
-    alert('OTP sent to +91 ' + formData.mobile);
-  };
-
-  const handleVerifyOTP = () => {
-    if (!formData.otp || formData.otp.length !== 6) {
-      setErrors(prev => ({ ...prev, otp: 'Please enter a valid 6-digit OTP' }));
-      return;
-    }
-    // Simulate OTP verification
-    setOtpVerified(true);
-    alert('OTP verified successfully!');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      alert('Application submitted successfully! Your application is pending admin verification. You will receive your User ID after approval.');
+    setSubmitToast(null);
+
+    try {
+      await submitRegistrationApplication(formData);
+      setFormData(getInitialFormData());
+      setErrors({});
+      setFormKey((prev) => prev + 1);
+      setSubmitToast({
+        type: 'success',
+        message: 'Application submitted successfully! Your application is pending admin verification.',
+      });
+    } catch (error) {
+      setSubmitToast({
+        type: 'error',
+        message: error.message || 'Failed to submit the application.',
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 2000);
+      setTimeout(() => setSubmitToast(null), 5000);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
         <div className="text-center mb-8">
           <div className="inline-block bg-yellow-300 px-6 py-3 mb-2">
             <h1 className="text-2xl md:text-3xl font-bold text-red-700" style={{ fontFamily: 'Georgia, serif' }}>
               For Typist / Stenographer / Designer / Computer Operator
             </h1>
           </div>
-          <p className="text-lg text-blue-700 font-medium">
-            (on www.mytypingwala.com)
-          </p>
+          <p className="text-lg text-blue-700 font-medium">(on www.mytypingwala.com)</p>
         </div>
 
-        {/* Main Title */}
         <div className="bg-white border-2 border-gray-300 rounded-none shadow-sm mb-6">
           <div className="bg-gray-100 px-6 py-4 border-b-2 border-gray-300">
             <h2 className="text-xl font-bold text-gray-800" style={{ fontFamily: 'Georgia, serif' }}>
@@ -134,8 +209,8 @@ const RegistrationForm = () => {
             </h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Role Selection */}
+          <form key={formKey} onSubmit={handleSubmit} className="p-6 space-y-6">
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -147,8 +222,10 @@ const RegistrationForm = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
                 >
-                  {roles.map(role => (
-                    <option key={role.value} value={role.value}>{role.label}</option>
+                  {roles.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      {role.label}
+                    </option>
                   ))}
                 </select>
                 {errors.role && <p className="text-red-600 text-sm mt-1">{errors.role}</p>}
@@ -170,7 +247,46 @@ const RegistrationForm = () => {
               </div>
             </div>
 
-            {/* Address */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Email ID <span className="text-red-600">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
+                placeholder="Enter your email address"
+              />
+              {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+            </div>
+
+            <div className="border-2 border-gray-200 p-4 bg-blue-50">
+              <h3 className="font-bold text-gray-700 mb-4">Mobile Number</h3>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Mobile Number <span className="text-red-600">*</span>
+                </label>
+                <div className="flex">
+                  <span className="inline-flex items-center px-4 py-2 border-2 border-r-0 border-gray-300 bg-gray-100 text-gray-700 font-medium">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleInputChange}
+                    maxLength="10"
+                    className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
+                    placeholder="10 digit mobile number"
+                  />
+                </div>
+                {errors.mobile && <p className="text-red-600 text-sm mt-1">{errors.mobile}</p>}
+              </div>
+              {/* OTP will be enabled later. */}
+            </div>
+
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Address <span className="text-red-600">*</span>
@@ -186,7 +302,6 @@ const RegistrationForm = () => {
               {errors.address && <p className="text-red-600 text-sm mt-1">{errors.address}</p>}
             </div>
 
-            {/* Photo Upload */}
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Photo <span className="text-red-600">*</span>
@@ -202,15 +317,12 @@ const RegistrationForm = () => {
               {errors.photo && <p className="text-red-600 text-sm mt-1">{errors.photo}</p>}
             </div>
 
-            {/* Shop Details - Optional */}
             <div className="border-2 border-dashed border-gray-300 p-4 bg-gray-50">
               <h3 className="font-bold text-gray-700 mb-4">Shop Details (Optional for Shop Owners)</h3>
-              
+
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Shop Address
-                  </label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Shop Address</label>
                   <input
                     type="text"
                     name="shopAddress"
@@ -223,9 +335,7 @@ const RegistrationForm = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Shop Act Certificate
-                    </label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Shop Act Certificate</label>
                     <input
                       type="file"
                       name="shopAct"
@@ -236,9 +346,7 @@ const RegistrationForm = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Shop Photo
-                    </label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Shop Photo</label>
                     <input
                       type="file"
                       name="shopPhoto"
@@ -253,103 +361,60 @@ const RegistrationForm = () => {
               </div>
             </div>
 
-            {/* Mobile Number with OTP */}
-            <div className="border-2 border-gray-200 p-4 bg-blue-50">
-              <h3 className="font-bold text-gray-700 mb-4">Mobile Verification</h3>
-              
-              <div className="space-y-4">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Mobile Number <span className="text-red-600">*</span>
-                    </label>
-                    <div className="flex">
-                      <span className="inline-flex items-center px-4 py-2 border-2 border-r-0 border-gray-300 bg-gray-100 text-gray-700 font-medium">
-                        +91
-                      </span>
-                      <input
-                        type="tel"
-                        name="mobile"
-                        value={formData.mobile}
-                        onChange={handleInputChange}
-                        maxLength="10"
-                        className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
-                        placeholder="10 digit mobile number"
-                      />
-                    </div>
-                    {errors.mobile && <p className="text-red-600 text-sm mt-1">{errors.mobile}</p>}
-                  </div>
-
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={handleSendOTP}
-                      disabled={otpSent}
-                      className="px-6 py-2 bg-blue-600 text-white font-bold rounded-none hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {otpSent ? 'OTP Sent' : 'Send OTP'}
-                    </button>
-                  </div>
-                </div>
-
-                {otpSent && (
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1">
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Enter OTP <span className="text-red-600">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="otp"
-                        value={formData.otp}
-                        onChange={handleInputChange}
-                        maxLength="6"
-                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
-                        placeholder="Enter 6-digit OTP"
-                        disabled={otpVerified}
-                      />
-                      {errors.otp && <p className="text-red-600 text-sm mt-1">{errors.otp}</p>}
-                    </div>
-
-                    <div className="flex items-end">
-                      <button
-                        type="button"
-                        onClick={handleVerifyOTP}
-                        disabled={otpVerified}
-                        className={`px-6 py-2 font-bold rounded-none ${
-                          otpVerified 
-                            ? 'bg-green-600 text-white cursor-default' 
-                            : 'bg-green-600 text-white hover:bg-green-700'
-                        }`}
-                      >
-                        {otpVerified ? 'Verified ✓' : 'Verify OTP'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Available Time */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+            <div className="border-2 border-gray-200 p-3 bg-white">
+              <h3 className="font-bold text-gray-700 mb-4">
                 Available Time <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                name="availableTime"
-                value={formData.availableTime}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
-                placeholder="e.g., 9:00 AM - 6:00 PM, Monday to Saturday"
-              />
-              {errors.availableTime && <p className="text-red-600 text-sm mt-1">{errors.availableTime}</p>}
+              </h3>
+
+              <div className="space-y-2">
+                {WEEK_DAYS.map((day) => {
+                  const slot = formData.availability[day];
+                  return (
+                    <div key={day}>
+                      <div className="grid grid-cols-1 md:grid-cols-[130px_auto_20px_auto] gap-2 items-center md:justify-start">
+                        <label className="inline-flex items-center gap-2 text-gray-700 font-medium text-sm">
+                          <input
+                            type="checkbox"
+                            checked={slot.enabled}
+                            onChange={() => handleAvailabilityToggle(day)}
+                            className="h-3.5 w-3.5 border-2 border-gray-400 rounded-none"
+                          />
+                          <span>{day}</span>
+                        </label>
+
+                        <input
+                          type="time"
+                          value={slot.from}
+                          onChange={(e) => handleAvailabilityTimeChange(day, 'from', e.target.value)}
+                          disabled={!slot.enabled}
+                          className="w-[130px] px-2 py-1.5 text-sm border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                        />
+
+                        <span className="text-gray-600 text-center text-sm">to</span>
+
+                        <input
+                          type="time"
+                          value={slot.to}
+                          onChange={(e) => handleAvailabilityTimeChange(day, 'to', e.target.value)}
+                          disabled={!slot.enabled}
+                          className="w-[130px] px-2 py-1.5 text-sm border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                        />
+                      </div>
+
+                      {errors[`availability_${day}`] && (
+                        <p className="text-red-600 text-sm mt-1">{errors[`availability_${day}`]}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {errors.availableTime && <p className="text-red-600 text-sm mt-3">{errors.availableTime}</p>}
             </div>
 
-            {/* Bank Details */}
             <div className="border-2 border-gray-200 p-4">
               <h3 className="font-bold text-gray-700 mb-4">Bank Details</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -398,23 +463,6 @@ const RegistrationForm = () => {
               </div>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Email ID <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
-                placeholder="Enter your email address"
-              />
-              {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
-            </div>
-
-            {/* Services List */}
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Services List <span className="text-red-600">*</span>
@@ -430,7 +478,6 @@ const RegistrationForm = () => {
               {errors.services && <p className="text-red-600 text-sm mt-1">{errors.services}</p>}
             </div>
 
-            {/* Aadhaar Upload */}
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Upload Aadhaar Card <span className="text-red-600">*</span>
@@ -446,7 +493,40 @@ const RegistrationForm = () => {
               {errors.aadhaar && <p className="text-red-600 text-sm mt-1">{errors.aadhaar}</p>}
             </div>
 
-            {/* Consent Section */}
+            <div className="border-2 border-gray-200 p-4 bg-gray-50">
+              <h3 className="font-bold text-gray-700 mb-3">Required Resources:</h3>
+              <div className="space-y-2">
+                <label className="inline-flex items-center gap-2 text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={formData.resources.computerLaptop}
+                    onChange={(e) => handleResourceChange('computerLaptop', e.target.checked)}
+                    className="h-4 w-4 border-2 border-gray-400 rounded-none"
+                  />
+                  <span>a) Computer / Laptop</span>
+                </label>
+                <label className="inline-flex items-center gap-2 text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={formData.resources.internet}
+                    onChange={(e) => handleResourceChange('internet', e.target.checked)}
+                    className="h-4 w-4 border-2 border-gray-400 rounded-none"
+                  />
+                  <span>b) Internet</span>
+                </label>
+                <label className="inline-flex items-center gap-2 text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={formData.resources.headphonesEarbuds}
+                    onChange={(e) => handleResourceChange('headphonesEarbuds', e.target.checked)}
+                    className="h-4 w-4 border-2 border-gray-400 rounded-none"
+                  />
+                  <span>c) Headphones / Earbuds</span>
+                </label>
+              </div>
+              {errors.equipment && <p className="text-red-600 text-sm mt-2">{errors.equipment}</p>}
+            </div>
+
             <div className="border-2 border-gray-300 p-4 bg-yellow-50">
               <div className="flex items-start gap-3">
                 <input
@@ -472,33 +552,44 @@ const RegistrationForm = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={isSubmitting || !otpVerified}
+                disabled={isSubmitting}
                 className="w-full md:w-auto px-8 py-3 bg-red-600 text-white font-bold text-lg rounded-none hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Application'}
               </button>
             </div>
 
-            {/* Footer Note */}
             <div className="border-t-2 border-gray-300 pt-4 mt-6">
               <p className="text-center text-sm font-bold text-red-600">
-                Mobile number OTP verification is mandatory at the time of registration.
+                Mobile number OTP verification will be enabled in a future update.
               </p>
             </div>
           </form>
         </div>
 
-        {/* Back to Home */}
         <div className="text-center mt-6">
           <Link to="/" className="text-blue-600 hover:text-blue-800 underline">
-            ← Back to Home
+            &larr; Back to Home
           </Link>
         </div>
       </div>
+
+      {submitToast && (
+        <div className="fixed top-4 right-4 z-50 max-w-md">
+          <div
+            className={`rounded border px-4 py-3 text-sm shadow-lg ${
+              submitToast.type === 'success'
+                ? 'border-green-200 bg-green-50 text-green-800'
+                : 'border-red-200 bg-red-50 text-red-700'
+            }`}
+          >
+            {submitToast.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

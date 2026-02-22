@@ -12,6 +12,8 @@ import TypingPlayground from "./pages/typing-playground";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import RegistrationForm from "./pages/RegistrationForm";
+import FormsPage from "./pages/forms";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const Routes = () => {
   return (
@@ -24,6 +26,8 @@ const Routes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/registration" element={<RegistrationForm />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/forms" element={<FormsPage />} />
         <Route path="/typing-test-interface" element={
           <ProtectedRoute>
             <TypingTestInterface />

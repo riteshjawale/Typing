@@ -8,6 +8,7 @@ import PlaygroundSection from './components/PlaygroundSection';
 import KeyboardsSection from './components/KeyboardsSection';
 import TypingLessonsSection from './components/TypingLessonsSection';
 import RegistrationSection from './components/RegistrationSection';
+import ScrollTopButton from './components/ScrollTopButton';
 import Footer from './components/Footer';
 
 const HomePage = () => {
@@ -36,6 +37,7 @@ const HomePage = () => {
         <TypingLessonsSection />
         <RegistrationSection />
       </main>
+      <ScrollTopButton />
       <Footer />
     </div>
   );
