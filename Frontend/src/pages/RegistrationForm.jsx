@@ -41,6 +41,7 @@ const RegistrationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const [submitToast, setSubmitToast] = useState(null);
+  const [copyFromDay, setCopyFromDay] = useState('Monday');
 
   const roles = [
     { value: '', label: 'Select Role' },
@@ -97,6 +98,39 @@ const RegistrationForm = () => {
     setErrors((prev) => {
       const next = { ...prev };
       delete next[`availability_${day}`];
+      return next;
+    });
+  };
+
+  const handleApplyTimeToAllDays = () => {
+    const source = formData.availability[copyFromDay];
+
+    if (!source.enabled || !source.from || !source.to) {
+      setErrors((prev) => ({
+        ...prev,
+        availableTime: `Set and select ${copyFromDay} time first, then apply to all days.`,
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      availability: WEEK_DAYS.reduce((acc, day) => {
+        acc[day] = {
+          enabled: true,
+          from: source.from,
+          to: source.to,
+        };
+        return acc;
+      }, {}),
+    }));
+
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.availableTime;
+      WEEK_DAYS.forEach((day) => {
+        delete next[`availability_${day}`];
+      });
       return next;
     });
   };
@@ -365,6 +399,28 @@ const RegistrationForm = () => {
               <h3 className="font-bold text-gray-700 mb-4">
                 Available Time <span className="text-red-600">*</span>
               </h3>
+
+              <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center">
+                <label className="text-sm font-medium text-gray-700">Copy time from:</label>
+                <select
+                  value={copyFromDay}
+                  onChange={(e) => setCopyFromDay(e.target.value)}
+                  className="w-full md:w-auto px-2 py-1.5 text-sm border-2 border-gray-300 rounded-none focus:border-blue-500 focus:outline-none"
+                >
+                  {WEEK_DAYS.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleApplyTimeToAllDays}
+                  className="w-full md:w-auto px-3 py-1.5 text-sm font-semibold bg-blue-600 text-white rounded-none hover:bg-blue-700"
+                >
+                  Apply to all days
+                </button>
+              </div>
 
               <div className="space-y-2">
                 {WEEK_DAYS.map((day) => {
