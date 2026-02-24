@@ -67,15 +67,13 @@ export const submitRegistrationApplication = async (formData) => {
     status: 'pending',
   };
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from(REGISTRATION_TABLE)
-    .insert(payload)
-    .select('id')
-    .single();
+    .insert(payload);
 
   if (error) {
     throw new Error(error.message || 'Failed to save registration form.');
   }
 
-  return data;
+  return { success: true };
 };
