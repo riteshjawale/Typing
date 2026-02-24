@@ -37,6 +37,7 @@ A modern React-based project utilizing the latest frontend technologies and tool
    - `VITE_SUPABASE_ANON_KEY`
    - `VITE_SUPABASE_REGISTRATION_TABLE`
    - `VITE_SUPABASE_REGISTRATION_BUCKET`
+   - `VITE_ADMIN_EMAIL`
 
 3. In Supabase SQL Editor, run:
    - `supabase/registration_setup.sql`

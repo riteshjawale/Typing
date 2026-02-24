@@ -31,6 +31,21 @@ for insert
 to anon, authenticated
 with check (true);
 
+drop policy if exists "Allow admin read registration applications" on public.registration_applications;
+create policy "Allow admin read registration applications"
+on public.registration_applications
+for select
+to authenticated
+using (auth.jwt() ->> 'email' = 'admin@mytypingwala.com');
+
+drop policy if exists "Allow admin update registration applications" on public.registration_applications;
+create policy "Allow admin update registration applications"
+on public.registration_applications
+for update
+to authenticated
+using (auth.jwt() ->> 'email' = 'admin@mytypingwala.com')
+with check (auth.jwt() ->> 'email' = 'admin@mytypingwala.com');
+
 insert into storage.buckets (id, name, public)
 values ('registration-documents', 'registration-documents', true)
 on conflict (id) do nothing;
