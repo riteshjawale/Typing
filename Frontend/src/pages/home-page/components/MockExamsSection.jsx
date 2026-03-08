@@ -8,9 +8,9 @@ const MockExamsSection = () => {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  const handleStartMockTest = () => {
+  const handleStartMockTest = (examId) => {
     if (isAuthenticated) {
-      navigate('/mock-exam-module');
+      navigate(`/mock-tests/${examId}`);
     } else {
       navigate('/login');
     }
@@ -24,14 +24,16 @@ const MockExamsSection = () => {
       sections: 5,
       locked: false,
       popular: true,
+      examId: 'mpsc-group-c',
     },
     {
-      title: 'Bombay High Court Typing Test Marathi / English',
+      title: 'Bombay High Court Typing Test English',
       description: 'Take Bombay High Court Typing Test for Marathi / English',
-      duration: '45 minutes',
+      duration: '10 minutes',
       sections: 6,
       locked: false,
       popular: false,
+      examId: 'bombay-high-court',
     },
   ];
 
@@ -104,7 +106,7 @@ const MockExamsSection = () => {
                     <Button
                       size="lg"
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                      onClick={handleStartMockTest}
+                      onClick={() => handleStartMockTest(exam.examId)}
                     >
                       Start Mock Test
                     </Button>

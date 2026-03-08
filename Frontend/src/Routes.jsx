@@ -9,6 +9,8 @@ import TypingTestInterface from "./pages/typing-test-interface";
 import NotFound from "./pages/NotFound";
 import MPSCSkillTestFlow from "./pages/mpsc-skill-test-flow";
 import MockExamModule from "./pages/mock-exam-module";
+import MockTestListPage from "./pages/mock-test-list";
+import MockTestDetailPage from "./pages/mock-test-detail";
 import TypingPlayground from "./pages/typing-playground";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -48,6 +50,16 @@ const Routes = () => {
         <Route path="/mock-exam-module" element={
           <ProtectedRoute>
             <MockExamModule />
+          </ProtectedRoute>
+        } />
+        <Route path="/mock-tests/:examId" element={
+          <ProtectedRoute>
+            <MockTestListPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/mock-tests/:examId/:testId" element={
+          <ProtectedRoute>
+            <MockTestDetailPage />
           </ProtectedRoute>
         } />
         <Route path="/typing-playground" element={

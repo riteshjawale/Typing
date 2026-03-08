@@ -5,9 +5,9 @@ import Button from '../../../components/ui/Button';
 const BombayHighCourtSection = () => {
   const courtExams = [
     {
-      title: 'Bombay High Court Typing Test Marathi / English',
+      title: 'Bombay High Court Typing Test English',
       description: 'Take Bombay High Court Typing Test for Marathi / English',
-      duration: '45 minutes',
+      duration: '10 minutes',
       sections: 6,
       locked: false,
       popular: true,

@@ -14,8 +14,8 @@ const Header = () => {
 
   const navItems = [
     { name: 'Home', path: '/home-page' },
-    { name: 'Typing test', path: '/typing-playground' },
-    { name: 'ID Registration', path: '/forms' },
+    { name: 'Typing Section', path: '/typing-playground' },
+    { name: 'Subscriber Section', path: '/forms' },
     { name: 'Forms', disabled: true },
   ];
 
